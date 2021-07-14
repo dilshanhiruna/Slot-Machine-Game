@@ -1,19 +1,32 @@
 package com.oop.slot_machine_game;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+
 
 import java.util.Random;
 
 import User.Login;
+import User.Register;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,8 +35,11 @@ public class MainActivity extends AppCompatActivity {
     private Wheel wheel1, wheel2, wheel3;
     private Button btn,logoutbtn;
     private boolean isStarted;
+    TextView pointview;
     String userID;
+    private static final String TAG = "REG";
     public static final Random RANDOM = new Random();
+    Integer currentPoints =0;
 
     public static long randomLong(long lower, long upper) {
         return lower + (long) (RANDOM.nextDouble() * (upper - lower));
@@ -40,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         btn = (Button) findViewById(R.id.startbutton);
         msg = (TextView) findViewById(R.id.messagetxt);
         logoutbtn = findViewById(R.id.logoutbtn);
+        pointview = (TextView) findViewById(R.id.pointview);
 
 
         fAuth = FirebaseAuth.getInstance();
@@ -52,6 +69,28 @@ public class MainActivity extends AppCompatActivity {
         else {
             userID = fAuth.getCurrentUser().getUid();
         }
+
+
+
+        //get user points from db
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection("users").document(userID);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    // Document found in the offline cache
+                    DocumentSnapshot document = task.getResult();
+                    currentPoints = document.getLong("points").intValue();
+                    pointview.setText(currentPoints.toString());
+                    Log.d(TAG, "Cached document data: " + document.getData());
+//                    Toast.makeText(getApplicationContext(), currentPoints.toString(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.d(TAG, "Cached get failed: ", task.getException());
+                }
+            }
+        });
+
 
         logoutbtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -31,7 +32,7 @@ public class Register extends AppCompatActivity {
     Button signup,signininstead;
     FirebaseAuth fAuth;
     String userID;
-
+    private static final String TAG = "REG";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,20 +75,16 @@ public class Register extends AppCompatActivity {
                             Toast.makeText(Register.this, "Registered Successfully", Toast.LENGTH_SHORT).show();
 
                             userID = fAuth.getCurrentUser().getUid();
+                            DocumentReference documentReference =db.collection("users").document(userID);
                             Map<String,Object> user = new HashMap<>();
-                            user.put("points", 0);
+                            user.put("points", 1000);
 
-                            db.collection(userID)
-                                    .add(user)
-                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                        private static final String TAG = "REG";
-
-                                        @Override
-                                        public void onSuccess(DocumentReference documentReference) {
-                                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                                        }
-                                    });
-
+                            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Log.d(TAG,"user profile is created for "+ userID);
+                                }
+                            });
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
                         }
