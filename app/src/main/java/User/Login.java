@@ -23,7 +23,7 @@ import com.oop.slot_machine_game.R;
 public class Login extends AppCompatActivity {
 
     EditText password, email;
-    Button signin;
+    Button signin,signupinstead;
     FirebaseAuth fAuth;
 
     @Override
@@ -34,8 +34,17 @@ public class Login extends AppCompatActivity {
         email= findViewById(R.id.emailLoginput);
         password= findViewById(R.id.passwordLoginput);
         signin= findViewById(R.id.signinbtn);
+        signupinstead= findViewById(R.id.signupinstead);
 
         fAuth = FirebaseAuth.getInstance();
+
+        signupinstead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), Register.class));
+            }
+        });
+
 
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
