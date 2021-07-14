@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
-                finish();
+                startActivity(new Intent(getApplicationContext(), Login.class));
             }
         });
 
@@ -116,6 +116,11 @@ public class MainActivity extends AppCompatActivity {
                 if (!betamount.getText().toString().equals("")){
 
                     if (currentPoints>Integer.parseInt(betamount.getText().toString())){
+
+                        if(Integer.parseInt(betamount.getText().toString())<2) {
+                            betamount.setError("Enter Amount more than 1");
+                            return;
+                        }
 
                         if (isStarted) {
 
