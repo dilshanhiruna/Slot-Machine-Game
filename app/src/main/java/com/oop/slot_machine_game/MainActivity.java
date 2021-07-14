@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
                             } else if (wheel1.currentIndex == wheel2.currentIndex || wheel2.currentIndex == wheel3.currentIndex
                                     || wheel1.currentIndex == wheel3.currentIndex) {
-                                msg.setText("Little Prize");
+                                msg.setText("Half Prize");
                                 if(Integer.parseInt(betamount.getText().toString())!=1) {
                                     //calculation
                                 currentPoints= currentPoints+ Integer.parseInt(betamount.getText().toString()) / 2;
@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     });
                                 }
-                            }, 200, randomLong(0, 200));
+                            }, 50, randomLong(0, 200));
 
                             wheel1.start();
 
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     });
                                 }
-                            }, 200, randomLong(150, 400));
+                            }, 50, randomLong(100, 400));
 
                             wheel2.start();
 
@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     });
                                 }
-                            }, 200, randomLong(150, 400));
+                            }, 50, randomLong(100, 400));
 
                             wheel3.start();
 
