@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -89,6 +90,11 @@ public class MainActivity extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     currentPoints = document.getLong("points").intValue();
                     pointview.setText(currentPoints.toString());
+                    //display you lose message
+                    if (currentPoints.equals(1)){
+                        pointview.setTextColor(Color.parseColor("#F40505"));
+                        pointview.setText("You Lose!");
+                    }
                     Log.d(TAG, "Cached document data: " + document.getData());
 //                    Toast.makeText(getApplicationContext(), currentPoints.toString(), Toast.LENGTH_SHORT).show();
                 } else {
@@ -105,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), Login.class));
             }
         });
-
 
 
 
@@ -130,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
                             if (wheel1.currentIndex == wheel2.currentIndex && wheel2.currentIndex == wheel3.currentIndex) {
                                 msg.setText("Jack Spot");
+                                //calculation
                                 currentPoints= currentPoints+ Integer.parseInt(betamount.getText().toString());
                                 updatePoints();
 
@@ -138,10 +144,12 @@ public class MainActivity extends AppCompatActivity {
                                     || wheel1.currentIndex == wheel3.currentIndex) {
                                 msg.setText("Little Prize");
                                 if(Integer.parseInt(betamount.getText().toString())!=1) {
+                                    //calculation
                                 currentPoints= currentPoints+ Integer.parseInt(betamount.getText().toString()) / 2;
                                 updatePoints();}
                             } else {
                                 msg.setText("You lose");
+                                //calculation
                                 currentPoints= currentPoints - Integer.parseInt(betamount.getText().toString());
                                 updatePoints();
                             }
@@ -211,6 +219,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //update coins in db
     void updatePoints(){
         pointview.setText(currentPoints.toString());
         Map<String,Object> user = new HashMap<>();
@@ -223,6 +232,12 @@ public class MainActivity extends AppCompatActivity {
                betamount.setText("");
            }
        });
+
+        //display you lose message
+       if (currentPoints==1){
+           pointview.setTextColor(Color.parseColor("#F40505"));
+           pointview.setText("You Lose!");
+       }
     }
 
 }

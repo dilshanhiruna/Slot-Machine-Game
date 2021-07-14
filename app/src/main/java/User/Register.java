@@ -67,6 +67,10 @@ public class Register extends AppCompatActivity {
                     password.setError("Password is required");
                     return;
                 }
+                if(mpassword.length() < 6){
+                    password.setError("Password must greater than 4 characters");
+                    return;
+                }
 
                 fAuth.createUserWithEmailAndPassword(memail,mpassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -86,6 +90,7 @@ public class Register extends AppCompatActivity {
                                 }
                             });
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            finish();
 
                         }
 
