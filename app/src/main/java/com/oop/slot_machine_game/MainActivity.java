@@ -8,11 +8,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -22,7 +24,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import User.Login;
@@ -35,11 +38,13 @@ public class MainActivity extends AppCompatActivity {
     private Wheel wheel1, wheel2, wheel3;
     private Button btn,logoutbtn;
     private boolean isStarted;
+    EditText betamount;
     TextView pointview;
     String userID;
     private static final String TAG = "REG";
     public static final Random RANDOM = new Random();
     Integer currentPoints =0;
+
 
     public static long randomLong(long lower, long upper) {
         return lower + (long) (RANDOM.nextDouble() * (upper - lower));
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         msg = (TextView) findViewById(R.id.messagetxt);
         logoutbtn = findViewById(R.id.logoutbtn);
         pointview = (TextView) findViewById(R.id.pointview);
+        betamount = findViewById(R.id.betamount);
 
 
         fAuth = FirebaseAuth.getInstance();
@@ -100,79 +106,118 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
+
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isStarted) {
-                    wheel1.stopWheel();
-                    wheel2.stopWheel();
-                    wheel3.stopWheel();
 
-                    if (wheel1.currentIndex == wheel2.currentIndex && wheel2.currentIndex == wheel3.currentIndex) {
-                        msg.setText("You win the big prize");
-                    } else if (wheel1.currentIndex == wheel2.currentIndex || wheel2.currentIndex == wheel3.currentIndex
-                            || wheel1.currentIndex == wheel3.currentIndex) {
-                        msg.setText("Little Prize");
-                    } else {
-                        msg.setText("You lose");
+                if (!betamount.getText().toString().equals("")){
+
+                    if (currentPoints>Integer.parseInt(betamount.getText().toString())){
+
+                        if (isStarted) {
+
+                            wheel1.stopWheel();
+                            wheel2.stopWheel();
+                            wheel3.stopWheel();
+
+                            if (wheel1.currentIndex == wheel2.currentIndex && wheel2.currentIndex == wheel3.currentIndex) {
+                                msg.setText("Jack Spot");
+                                currentPoints= currentPoints+ Integer.parseInt(betamount.getText().toString());
+                                updatePoints();
+
+
+                            } else if (wheel1.currentIndex == wheel2.currentIndex || wheel2.currentIndex == wheel3.currentIndex
+                                    || wheel1.currentIndex == wheel3.currentIndex) {
+                                msg.setText("Little Prize");
+                                if(Integer.parseInt(betamount.getText().toString())!=1) {
+                                currentPoints= currentPoints+ Integer.parseInt(betamount.getText().toString()) / 2;
+                                updatePoints();}
+                            } else {
+                                msg.setText("You lose");
+                                currentPoints= currentPoints - Integer.parseInt(betamount.getText().toString());
+                                updatePoints();
+                            }
+
+                            btn.setText("Start");
+                            isStarted = false;
+
+                        } else {
+
+                            wheel1 = new Wheel(new Wheel.WheelListener() {
+                                @Override
+                                public void newImage(final int img) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            img1.setImageResource(img);
+                                        }
+                                    });
+                                }
+                            }, 200, randomLong(0, 200));
+
+                            wheel1.start();
+
+                            wheel2 = new Wheel(new Wheel.WheelListener() {
+                                @Override
+                                public void newImage(final int img) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            img2.setImageResource(img);
+                                        }
+                                    });
+                                }
+                            }, 200, randomLong(150, 400));
+
+                            wheel2.start();
+
+                            wheel3 = new Wheel(new Wheel.WheelListener() {
+                                @Override
+                                public void newImage(final int img) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            img3.setImageResource(img);
+                                        }
+                                    });
+                                }
+                            }, 200, randomLong(150, 400));
+
+                            wheel3.start();
+
+                            btn.setText("Stop");
+                            msg.setText("");
+                            isStarted = true;
+                        }
+                    }else {
+                        betamount.setError("Invalid Amount");
                     }
 
-                    btn.setText("Start");
-                    isStarted = false;
+                }else {
 
-                } else {
-
-                    wheel1 = new Wheel(new Wheel.WheelListener() {
-                        @Override
-                        public void newImage(final int img) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    img1.setImageResource(img);
-                                }
-                            });
-                        }
-                    }, 200, randomLong(0, 200));
-
-                    wheel1.start();
-
-                    wheel2 = new Wheel(new Wheel.WheelListener() {
-                        @Override
-                        public void newImage(final int img) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    img2.setImageResource(img);
-                                }
-                            });
-                        }
-                    }, 200, randomLong(150, 400));
-
-                    wheel2.start();
-
-                    wheel3 = new Wheel(new Wheel.WheelListener() {
-                        @Override
-                        public void newImage(final int img) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    img3.setImageResource(img);
-                                }
-                            });
-                        }
-                    }, 200, randomLong(150, 400));
-
-                    wheel3.start();
-
-                    btn.setText("Stop");
-                    msg.setText("");
-                    isStarted = true;
+                    betamount.setError("Enter Amount");
                 }
+
+
             }
         });
-
-//        request.time < timestamp.date(2021, 8, 13)
-
-
     }
+
+    void updatePoints(){
+        pointview.setText(currentPoints.toString());
+        Map<String,Object> user = new HashMap<>();
+        user.put("points", currentPoints);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection("users").document(userID);
+       docRef.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+           @Override
+           public void onSuccess(Void unused) {
+               betamount.setText("");
+           }
+       });
+    }
+
 }
